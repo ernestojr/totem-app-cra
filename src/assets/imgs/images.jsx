@@ -4,8 +4,12 @@ import L from './logo/l.svg';
 import I from './logo/i.svg';
 import V from './logo/v.svg';
 
+import LogoTolivBlack from './logo-toliv-black.svg';
+
 export const t = T;
 export const o = O;
 export const l = L;
 export const i = I;
 export const v = V;
+
+export const logoTolivBlack = LogoTolivBlack;
