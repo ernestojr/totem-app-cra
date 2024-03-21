@@ -1,0 +1,57 @@
+.footer-app {
+  position: fixed;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: right;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+  background: white;
+  padding: 10px 70px 90px 70px;
+}
+
+.footer-app__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 500px;
+  height: 200px;
+
+  border-radius: 20px;
+  border: 1px solid #CECECE;
+  background: #FFF;
+}
+
+.footer-app_total__key {
+  color: #4F4545;
+  font-size: 48px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.footer-app_total__value {
+  color: #4F4545;
+  text-align: right;
+  font-size: 48px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.footer-app__button-pay {
+  width: 240px;
+  height: 200px;
+
+  border-radius: 20px;
+  border: none;
+  background: var(--primary);
+
+  color: #FFF;
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.footer-app__button-pay:disabled {
+  background: #CECECE;
+}

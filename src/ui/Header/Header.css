@@ -1,0 +1,25 @@
+.header-app {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 90px;
+  z-index: 1000;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: white;
+  border: 1px solid var(--categorias, #F2F0F0);
+}
+
+.header-app button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0px 30px;
+}
+
+.header-app button:active img {
+  transform: scale(0.9);
+}

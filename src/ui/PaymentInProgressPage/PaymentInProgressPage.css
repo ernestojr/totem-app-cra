@@ -1,0 +1,20 @@
+.payment-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.payment-status__in-progress {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.payment-status__in-progress p {
+  color: #4F4545;
+  font-size: 48px;
+  font-style: normal;
+  font-weight: 400;
+}
