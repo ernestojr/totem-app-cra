@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Form, Button, Input } from "antd";
-import { cloneDeep, get } from 'lodash';
+import { get } from 'lodash';
 import numeral from 'numeral';
 
 import OrangePage from "./ui/OrangePage/OrangePage";
