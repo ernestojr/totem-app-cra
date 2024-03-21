@@ -365,7 +365,7 @@ function App() {
     setShowCartPage(false);
     setShowPaymentInProgressPage(true);
     setTimeout(() => {
-      setPaymentStatus(PAYMENT_STATUS.ERROR);
+      setPaymentStatus(PAYMENT_STATUS.SUCCESS);
     }, 2000);
   }
 
@@ -376,7 +376,9 @@ function App() {
   };
 
   const onGoHomeClick = () => {
-    
+    setShoppingCart({});
+    setShowPaymentInProgressPage(false);
+    setShowOrangePage(true);
   }
 
   return (
