@@ -12,7 +12,6 @@ import Footer from "./ui/Footer/Footer";
 import ProductList from "./ui/ProductList/ProductList";
 import ProductDetailModal from "./ui/ProductDetailModal/ProductDetailModalV2";
 
-
 import Logo from "./assets/imgs/logo-toliv.png";
 
 import "./App.css";
@@ -22,6 +21,12 @@ import {
   fetchGetProductById,
   fetchGetBranchOfficeById,
 } from "./lib/data";
+
+export const PAYMENT_STATUS = {
+  SUCCESS: 'success',
+  ERROR: 'error',
+  PROCESSING: 'processing',
+};
 
 const SHOPPING_CART_ITEM = "shopping_cart";
 const BRANCH_OFFICE_ID_ITEM = "branch_office_id";
@@ -36,6 +41,7 @@ function App() {
   const [showOrangePage, setShowOrangePage] = useState(true);
   const [showCartPage, setShowCartPage] = useState(false);
   const [showPaymentInProgressPage, setShowPaymentInProgressPage] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(PAYMENT_STATUS.PROCESSING);
 
   useEffect(() => {
     initCommerceCode();
@@ -376,11 +382,22 @@ function App() {
   }; */
 
   const onClickPayActionStepTwo = () => {
-
-
-
+    setPaymentStatus(PAYMENT_STATUS.PROCESSING);
     setShowCartPage(false);
     setShowPaymentInProgressPage(true);
+    setTimeout(() => {
+      setPaymentStatus(PAYMENT_STATUS.ERROR);
+    }, 2000);
+  }
+
+  const onGoBackClick = () => {
+    setShowCartPage(true);
+    setShowPaymentInProgressPage(false);
+    setPaymentStatus(PAYMENT_STATUS.PROCESSING);
+  };
+
+  const onGoHomeClick = () => {
+    
   }
 
   return (
@@ -438,7 +455,11 @@ function App() {
         showPaymentInProgressPage &&
           <PaymentInProgressPage
             shoppingCart={shoppingCart}
-            branchOfficeData={branchOffice} />
+            branchOfficeData={branchOffice}
+            paymentStatus={paymentStatus}
+            onRetryerClick={onClickPayActionStepTwo}
+            onGoHomeClick={onGoHomeClick}
+            onGoBackClick={onGoBackClick} />
       }
       <Modal
         title="Atención"
