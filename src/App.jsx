@@ -96,25 +96,22 @@ function App() {
     getBranchOfficeData(values.branchOfficeId);
   };
 
-  const onAddProductClick = (product) => {
+  const onAddProductClick = async (product) => {
     console.log("onAddProductClick", product);
-    const {
-      product: { id: pid },
-    } = product;
+    const { id: pid } = product;
     const newShoppingCart = { ...shoppingCart };
     if (newShoppingCart[pid]) {
       newShoppingCart[pid].quantity += 1;
     } else {
-      newShoppingCart[pid] = { ...cloneDeep(product), quantity: 1 };
+      const data = await getProductById(pid);
+      newShoppingCart[pid] = { ...data, quantity: 1 };
     }
     updateShoppingCart(newShoppingCart);
   };
 
   const onRemoveProductClick = (product) => {
     console.log("onRemoveProductClick", product);
-    const {
-      product: { id: pid },
-    } = product;
+    const { id: pid } = product;
     const newShoppingCart = { ...shoppingCart };
     if (newShoppingCart[pid]) {
       newShoppingCart[pid].quantity -= 1;
@@ -125,10 +122,9 @@ function App() {
     }
   };
 
-  const onClickProduct = async ({ id: pid }) => {
+  const getProductById = async (pid) => {
     const response = await fetchGetProductById(branchOffice.id, pid);
     const product = get(response, 'data', null);
-    console.log(`respuesta start ${JSON.stringify(product)}`);
     if (product) {
       const productGroup = get(product, 'branch_offices_products_groups', null);
       if (productGroup) {
@@ -150,26 +146,21 @@ function App() {
                 disabled: !option.active,
               });
               option.value = 0;
-
               const arraySelect = [];
               let maximoFor = 0;
-
               if (option.max_quantity > 0) {
                 maximoFor = option.max_quantity;
               } else {
                 maximoFor = group.max_value;
               }
-
               for (let l = 0; l < maximoFor; l++) {
                 arraySelect.push(l);
               }
-
               if (arraySelect.length > 0) {
                 arraySelect.push(arraySelect.length);
                 option.arraySelect = arraySelect;
               }
             });
-
             if (arrayOptions.length > 0) {
               group.options = arrayOptions;
               group.optionsSelected = [];
@@ -178,30 +169,18 @@ function App() {
             group.count = 0;
           }
         });
-
       }
-
       product.quantity = 1;
       product.loading = true;
-
-      console.log(`respuesta finish ${JSON.stringify(product)}`);
-      setProductSelected(product);
-      setProductSelected(cloneDeep(product));
-      setShowProductDetailModal(true);
-      //setTotal(product.price);
-
-      /* if (
-        (response.data.branch_offices_products_groups &&
-          response.data.branch_offices_products_groups.length > 0) ||
-        showModal
-      ) {
-        console.log("modal");
-        setVisible(true);
-      } else {
-        addProductNoOptions(response.data);
-        setLoadingButton(null);
-      } */
     }
+    return product;
+  };
+
+  const onClickProduct = async ({ id: pid }) => {
+    const product = await getProductById(pid);
+    console.log(`respuesta finish ${JSON.stringify(product)}`);
+    setProductSelected(product);
+    setShowProductDetailModal(true);
   };
 
   const onClickPayAction = () => {

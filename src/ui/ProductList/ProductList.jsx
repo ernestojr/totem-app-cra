@@ -43,7 +43,7 @@ export default function ProductList(props) {
   };
 
   const getQuantity = (product) => {
-    const { product: { id: pid } } = product;
+    const { id: pid } = product;
     return shoppingCart[pid] ? shoppingCart[pid].quantity : 0;
   }
 
