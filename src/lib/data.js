@@ -41,10 +41,10 @@ export async function fetchCreateOrder(data) {
 }
 
 export async function fetchPosSale(ticket, amount) {
-  const url = `${API_HOST_POS}/orders?domain=${window.location.host}`;
+  const url = `${API_HOST_POS}/api/pos-autoservicio/sale`;
   const res = await fetch(url, {
     method: 'post',
-    body: JSON.stringify({ ticket, amount }),
+    body: JSON.stringify({ ticket_code: ticket, amount }),
     headers: {
       "Content-Type": "application/json",
     },
