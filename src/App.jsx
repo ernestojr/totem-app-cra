@@ -20,6 +20,11 @@ import {
   fetchGetProductsByBranchOfficeId,
   fetchGetProductById,
   fetchGetBranchOfficeById,
+
+  fetchCreateOrder,
+  fetchPosSale,
+  fetchConfirmPosSale,
+  fetchGetOrderById,
 } from "./lib/data";
 
 export const PAYMENT_STATUS = {
@@ -30,6 +35,8 @@ export const PAYMENT_STATUS = {
 
 const SHOPPING_CART_ITEM = "shopping_cart";
 const BRANCH_OFFICE_ID_ITEM = "branch_office_id";
+
+const POS_PAYMENT_METHOD_ID = 11;
 
 function App() {
   const [branchOffice, setBranchOffice] = useState(null);
@@ -104,6 +111,18 @@ function App() {
       newShoppingCart[pid].quantity += 1;
     } else {
       const data = await getProductById(pid);
+      if (
+        Array.isArray(data.branch_offices_products_groups)
+        && data.branch_offices_products_groups.length > 0
+      ) {
+        // TODO: Show modal
+      } else {
+        // TODO: Solo agregar
+        data.totalOrder = data.price * data.quantity;
+        data.observations = "";
+        data.allOptions = [];
+      }
+      console.log('onAddProductClick', data);
       newShoppingCart[pid] = { ...data, quantity: 1 };
     }
     updateShoppingCart(newShoppingCart);
@@ -178,7 +197,7 @@ function App() {
 
   const onClickProduct = async ({ id: pid }) => {
     const product = await getProductById(pid);
-    console.log(`respuesta finish ${JSON.stringify(product)}`);
+    console.log(`onClickProduct product ${JSON.stringify(product)}`);
     setProductSelected(product);
     setShowProductDetailModal(true);
   };
@@ -360,13 +379,81 @@ function App() {
     }
   }; */
 
+  const buildProductsToSale = (productsInCart) => {
+    return productsInCart.map((product) => ({
+      product_id: product.product.id,
+      branch_office_product_id: product.id,
+      quantity: product.quantity,
+      observations: product.observations,
+      products_groups_options: [], // TODO: Pendiente de terminar
+      branch_offices_products_list_id: product.branch_offices_products_list.id,
+    }));
+  }
+
   const onClickPayActionStepTwo = () => {
+    const productsInCart = Object.values(shoppingCart);
+    const data = {
+      branch_office_id: branchOffice.id,
+      users_address_id: null, // TODO: Consultar por este campo
+      delivery_method_id: 3, // TODO: Consultar por este campo
+      payment_method_id: POS_PAYMENT_METHOD_ID,
+      user_payment_methods_storage_id: null, // TODO: Consultar por este campo
+      installments_number: 1,
+      observations: "", // TODO: Consultar por este campo
+      products: buildProductsToSale(productsInCart),
+      coupon_code: null, // TODO: Consultar por este campo
+      delivery_tips: 0, // TODO: Implementar el tip desde backend.
+      branch_offices_table_id: undefined, // TODO: Consultar por este campo
+    };
+    goToSale(data);
+  }
+
+  const getListProducts = () => {
+
+  };
+
+  const removeAccents = text => text.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  
+  const printInvoice = async (responseTbk, order) => {
+    const { voucher: tbkVoucher } = responseTbk;
+    const result = await window.electronAPI.printInvoice({ tbkVoucher, order: JSON.parse(removeAccents(JSON.stringify(order))) });
+    if (result.ok) {
+      console.log('ok print');
+    }
+  };
+
+  const goToSale = async (data) => {
     setPaymentStatus(PAYMENT_STATUS.PROCESSING);
     setShowCartPage(false);
     setShowPaymentInProgressPage(true);
-    setTimeout(() => {
+    try {
+      let responseOrder = await fetchCreateOrder(data);
+      if (!responseOrder || !responseOrder.success) {
+        setPaymentStatus(PAYMENT_STATUS.ERROR);
+        if (!responseOrder.has_stock) {
+          getListProducts(); // TODO: Revisar que hacemos acá
+        }
+        return;
+      }
+      const { order_id: orderId, total_amount: totalAmount, uuid } = responseOrder.data;
+      const responsePos = await fetchPosSale(orderId, totalAmount);
+      if (!responsePos || !responsePos.successful) {
+        setPaymentStatus(PAYMENT_STATUS.ERROR);
+        return;
+      }
+      const responseConfirm = await fetchConfirmPosSale(orderId, uuid, responsePos);
+      if (!responseConfirm || !responseConfirm.success) {
+        setPaymentStatus(PAYMENT_STATUS.ERROR);
+        return;
+      }
+      const reponseOrderDetail = await fetchGetOrderById(orderId, uuid);
+      await printInvoice(responsePos, reponseOrderDetail.data);
       setPaymentStatus(PAYMENT_STATUS.SUCCESS);
-    }, 2000);
+    } catch (error) {
+      console.log(error);
+      setPaymentStatus(PAYMENT_STATUS.ERROR);
+    }
   }
 
   const onGoBackClick = () => {
