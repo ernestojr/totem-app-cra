@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Form, Button, Input } from "antd";
-import { get } from 'lodash';
+import { get, has } from 'lodash';
 import numeral from 'numeral';
 
 import OrangePage from "./ui/OrangePage/OrangePage";
@@ -110,20 +110,37 @@ function App() {
   };
 
   const addProductFromModal = (product) => {
-
+    addProductToShoppingCart(product);
   };
+
+  const addProductToShoppingCart = (product) => {
+    const { id: pid, quantity: productQuantity, price: productPrice } = product;
+    const newShoppingCart = { ...shoppingCart };
+    if (!hasProductGroup(product)) {
+       if (shoppingCart[pid]) {
+        const newQuantity = newShoppingCart[pid].quantity + productQuantity;
+        const newTotalOrder = productPrice * newQuantity;
+        newShoppingCart[pid].quantity = newQuantity;
+        newShoppingCart[pid].totalOrder = newTotalOrder;
+       } else {
+        product.totalOrder = product.price * productQuantity;
+        product.observations = "";
+        product.allOptions = [];
+        newShoppingCart[pid] = { ...product, quantity: productQuantity };
+      }
+    }
+    updateShoppingCart(newShoppingCart);  
+  }
 
   const onAddProductClick = async (product) => {
     const { id: pid } = product;
     const newShoppingCart = { ...shoppingCart };
-    if (newShoppingCart[pid]) {
+    if (newShoppingCart[pid] && !hasProductGroup(newShoppingCart[pid])) {
       newShoppingCart[pid].quantity += 1;
+      newShoppingCart[pid].totalOrder = newShoppingCart[pid].quantity * newShoppingCart[pid].price;
     } else {
       const data = await getProductById(pid);
-      if (
-        Array.isArray(data.branch_offices_products_groups)
-        && data.branch_offices_products_groups.length > 0
-      ) {
+      if (hasProductGroup(data)) {
         // TODO: Show modal
         setProductSelected({ ...data, quantity: 1 });
         setShowProductDetailModal(true);
@@ -133,14 +150,12 @@ function App() {
       data.totalOrder = data.price * data.quantity;
       data.observations = "";
       data.allOptions = [];
-      console.log('onAddProductClick', data);
       newShoppingCart[pid] = { ...data, quantity: 1 };
     }
     updateShoppingCart(newShoppingCart);
   };
 
   const onRemoveProductClick = (product) => {
-    console.log("onRemoveProductClick", product);
     const { id: pid } = product;
     const newShoppingCart = { ...shoppingCart };
     if (newShoppingCart[pid]) {
@@ -208,23 +223,19 @@ function App() {
 
   const onClickProduct = async ({ id: pid }) => {
     const product = await getProductById(pid);
-    console.log(`onClickProduct product ${JSON.stringify(product)}`);
-    setProductSelected(product);
+    setProductSelected({ ...product, quantity: 1 });
     setShowProductDetailModal(true);
   };
 
   const onClickPayAction = () => {
-    console.log("onClickPayAction");
     setShowCartPage(true);
   }
 
   const onClickStart = () => {
-    console.log("onClickStart");
     setShowOrangePage(false);
   }
 
   const onClickBackAction = () => {
-    console.log("onClickBackAction");
     if (showCartPage) {
       setShowCartPage(false);
     } else {
@@ -286,7 +297,6 @@ function App() {
     const intervalId = setInterval(() => {
       setCurrentSecund(currentSecund);
       if (currentSecund <= 0) {
-        console.log('close interval');
         clearInterval(intervalId);
         onGoHomeClick();
       }
@@ -323,7 +333,7 @@ function App() {
       setPaymentStatus(PAYMENT_STATUS.SUCCESS);
       setTimerToGoToHome();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setPaymentStatus(PAYMENT_STATUS.ERROR);
     }
   }
@@ -371,9 +381,10 @@ function App() {
               />
             )}
           <ProductDetailModal
-            onAddProduct={onAddProductClick}
+            onAddProduct={addProductFromModal}
             onRemoveProduct={onRemoveProductClick}
             productSelected={productSelected}
+            setProductSelected={setProductSelected}
             branchOfficeData={branchOffice}
             show={showProductDetailModal}
             setShow={setShowProductDetailModal}

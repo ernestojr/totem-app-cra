@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Modal, Form, Alert, Checkbox, Radio, Select } from 'antd';
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { get } from 'lodash';
 import numeral from 'numeral';
 
@@ -10,6 +11,7 @@ export default function ProductDetailModel(props) {
     onAddProduct,
     onRemoveProduct,
     productSelected,
+    setProductSelected,
     branchOfficeData,
     show,
     setShow,
@@ -18,6 +20,7 @@ export default function ProductDetailModel(props) {
   const [isOk, setIsOk] = useState(true);
 
   const handleOk = () => {
+    onAddProduct(productSelected);
     setShow(false);
   };
 
@@ -51,6 +54,16 @@ export default function ProductDetailModel(props) {
 
   const onChangeSelect = (e, product, options) => {
 
+  };
+
+  const onRemoveProductClick = () => {
+    if (productSelected.quantity >= 2) {
+      setProductSelected({ ...productSelected, quantity: productSelected.quantity - 1 });
+    }
+  };
+
+  const onAddProductClick = () => {
+    setProductSelected({ ...productSelected, quantity: productSelected.quantity + 1 });
   };
 
   const showGroup = () => get(productSelected, "branch_offices_products_groups", [])
@@ -303,7 +316,6 @@ export default function ProductDetailModel(props) {
         </div>
       </div>
     ));
-
   return (
     <>
       <Modal
@@ -312,30 +324,52 @@ export default function ProductDetailModel(props) {
         onOk={handleOk}
         width={800}
         onCancel={handleCancel}
-        footer={[
-          <Button key="back" onClick={handleCancel}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
-            Agregar
-          </Button>,
-        ]}>
+        footer={[]}>
           {
-            productSelected && <div className='modal-container'>
-              <div className='modal-container__image'>
+            productSelected && 
+            <Form
+              layout="vertical"
+              name="modal">
+              <div className='modal-container'>
+                <div className='modal-container__image'>
                 { image && <img src={image} alt={productSelected.product.name} /> }
-              </div>
-              <div className='modal-container__detail'>
-                <h1 className='product-name'>{productSelected.product.name}</h1>
-                <p className='product-price'>${numeral(productSelected.price).format('0,0[,]0').replace(/,/g, '.')}</p>
-                <Form
-                  layout="vertical"
-                  name="modal">
+                </div>
+                <div className='modal-container__detail'>
+                  <h1 className='product-name'>{productSelected.product.name}</h1>
+                  <p className='product-price'>${numeral(productSelected.price).format('0,0[,]0').replace(/,/g, '.')}</p>
                   { showAlert() }
                   { showGroup() }
-                </Form>
+                  <div className='modal-container__detail__cart-actions'>
+                    <p>Cantidad deseada</p>
+                    <div className='cart-actions-white'>
+                      <Button
+                        className='card-button'
+                        type="default"
+                        shape="circle"
+                        size="large"
+                        icon={<MinusOutlined />}
+                        onClick={(e) => onRemoveProductClick()} />
+                      <p>{productSelected.quantity}</p>
+                      <Button
+                        className='card-button'
+                        type="default"
+                        shape="circle"
+                        size="large"
+                        icon={<PlusOutlined />}
+                        onClick={(e) => onAddProductClick()} />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+              <div className='modal__button-group'>
+                <Button key="back" size='large' onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button key="submit" size='large' type="primary" onClick={handleOk}>
+                  Agregar ${numeral(productSelected.price * productSelected.quantity).format('0,0[,]0').replace(/,/g, '.')}
+                </Button>
+              </div>
+            </Form>
           }
       </Modal>
     </>

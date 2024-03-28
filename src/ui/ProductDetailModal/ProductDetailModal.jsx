@@ -30,9 +30,6 @@ export default function ProductDetailModel(props) {
   };
 
   const handleRadio = (e, product) => {
-    console.log("e.target.value", e.target.value);
-    console.log("product", product);
-
     for (
       var i = 0;
       i < productSelected.branch_offices_products_groups.length;

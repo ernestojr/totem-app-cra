@@ -21,9 +21,6 @@ export default function PaymentInProgressPage(props) {
     onGoBackClick,
     onGoHomeClick,
   } = props;
-  
-  console.log(shoppingCart, branchOfficeData);
-
   return (
     <div className='payment-status'>
       {
@@ -44,19 +41,6 @@ export default function PaymentInProgressPage(props) {
             </div>
           </div>
       }
-      {/*
-        paymentStatus === PAYMENT_STATUS.SUCCESS &&
-          <Result
-            status="success"
-            title="¡Venta generada exitosamente!"
-            subTitle="Retire voucher"
-            extra={[
-              <Button type="primary" key="console" onClick={() => onGoHomeClick()}>
-                Volver al inicio
-              </Button>,
-            ]}
-          />
-          */}
       {
         paymentStatus === PAYMENT_STATUS.ERROR &&
           <Result
@@ -64,8 +48,8 @@ export default function PaymentInProgressPage(props) {
             title="Tuvimos problemas para procesar su pago"
             subTitle="Lo sentimos, reintente nuevamente por favor"
             extra={[
-              <Button key="buy" onClick={() => onGoBackClick()}>Volver</Button>,
-              <Button type="primary" key="console" onClick={() => onRetryerClick()}>
+              <Button size="large" key="buy" onClick={() => onGoBackClick()}>Volver</Button>,
+              <Button size="large" type="primary" key="console" onClick={() => onRetryerClick()}>
                 Reintentar
               </Button>,
             ]}
