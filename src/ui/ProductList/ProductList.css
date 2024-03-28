@@ -3,3 +3,7 @@
   flex-wrap: wrap;
   justify-content: space-around;
 }
+
+.ant-tabs {
+  margin-bottom: 30rem;
+}

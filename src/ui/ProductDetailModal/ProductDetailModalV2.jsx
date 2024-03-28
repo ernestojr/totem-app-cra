@@ -6,7 +6,15 @@ import numeral from 'numeral';
 import './ProductDetailModal.css';
 
 export default function ProductDetailModel(props) {
-  const { productSelected, branchOfficeData, show, setShow } = props;
+  const {
+    onAddProduct,
+    onRemoveProduct,
+    productSelected,
+    branchOfficeData,
+    show,
+    setShow,
+  } = props;
+
   const [isOk, setIsOk] = useState(true);
 
   const handleOk = () => {
@@ -40,13 +48,9 @@ export default function ProductDetailModel(props) {
   const handleRadio = (e, product) => {
 
   };
+
   const onChangeSelect = (e, product, options) => {
 
-  };
-
-  const radioStyle = {
-    display: "block",
-    height: "auto",
   };
 
   const showGroup = () => get(productSelected, "branch_offices_products_groups", [])
@@ -207,7 +211,6 @@ export default function ProductDetailModel(props) {
                 product.branch_offices_products_groups_options.map(
                   (options, i) => (
                     <Radio
-                      style={radioStyle}
                       value={options.id}
                       disabled={!options.active}
                     >
@@ -309,7 +312,14 @@ export default function ProductDetailModel(props) {
         onOk={handleOk}
         width={800}
         onCancel={handleCancel}
-        footer={[]}>
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Agregar
+          </Button>,
+        ]}>
           {
             productSelected && <div className='modal-container'>
               <div className='modal-container__image'>

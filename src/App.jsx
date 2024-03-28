@@ -49,6 +49,7 @@ function App() {
   const [showCartPage, setShowCartPage] = useState(false);
   const [showPaymentInProgressPage, setShowPaymentInProgressPage] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(PAYMENT_STATUS.PROCESSING);
+  const [currentSecund, setCurrentSecund] = useState(0);
 
   useEffect(() => {
     initCommerceCode();
@@ -103,8 +104,16 @@ function App() {
     getBranchOfficeData(values.branchOfficeId);
   };
 
+  const hasProductGroup = (product) => {
+    return Array.isArray(product.branch_offices_products_groups)
+      && product.branch_offices_products_groups.length > 0;
+  };
+
+  const addProductFromModal = (product) => {
+
+  };
+
   const onAddProductClick = async (product) => {
-    console.log("onAddProductClick", product);
     const { id: pid } = product;
     const newShoppingCart = { ...shoppingCart };
     if (newShoppingCart[pid]) {
@@ -116,12 +125,14 @@ function App() {
         && data.branch_offices_products_groups.length > 0
       ) {
         // TODO: Show modal
-      } else {
-        // TODO: Solo agregar
-        data.totalOrder = data.price * data.quantity;
-        data.observations = "";
-        data.allOptions = [];
+        setProductSelected({ ...data, quantity: 1 });
+        setShowProductDetailModal(true);
+        return;
       }
+      // TODO: Solo agregar
+      data.totalOrder = data.price * data.quantity;
+      data.observations = "";
+      data.allOptions = [];
       console.log('onAddProductClick', data);
       newShoppingCart[pid] = { ...data, quantity: 1 };
     }
@@ -259,11 +270,29 @@ function App() {
   
   const printInvoice = async (responseTbk, order) => {
     const { voucher: tbkVoucher } = responseTbk;
-    const result = await window.electronAPI.printInvoice({ tbkVoucher, order: JSON.parse(removeAccents(JSON.stringify(order))) });
-    if (result.ok) {
-      console.log('ok print');
+    if (window.electronAPI) {
+      const result = await window.electronAPI.printInvoice({ tbkVoucher, order: JSON.parse(removeAccents(JSON.stringify(order))) });
+      if (result.ok) {
+        console.log('ok print');
+      }
+    } else {
+      console.log('No se encontro integración con electron');
     }
   };
+
+  const setTimerToGoToHome = () => {
+    const TIME_TO_WAIT = 5;
+    let currentSecund = TIME_TO_WAIT;
+    const intervalId = setInterval(() => {
+      setCurrentSecund(currentSecund);
+      if (currentSecund <= 0) {
+        console.log('close interval');
+        clearInterval(intervalId);
+        onGoHomeClick();
+      }
+      currentSecund--;
+    }, 1000);
+  }
 
   const goToSale = async (data) => {
     setPaymentStatus(PAYMENT_STATUS.PROCESSING);
@@ -292,7 +321,7 @@ function App() {
       const reponseOrderDetail = await fetchGetOrderById(orderId, uuid);
       await printInvoice(responsePos, reponseOrderDetail.data);
       setPaymentStatus(PAYMENT_STATUS.SUCCESS);
-      updateShoppingCart({});
+      setTimerToGoToHome();
     } catch (error) {
       console.log(error);
       setPaymentStatus(PAYMENT_STATUS.ERROR);
@@ -306,7 +335,7 @@ function App() {
   };
 
   const onGoHomeClick = () => {
-    setShoppingCart({});
+    updateShoppingCart({});
     setShowPaymentInProgressPage(false);
     setShowOrangePage(true);
   }
@@ -342,6 +371,8 @@ function App() {
               />
             )}
           <ProductDetailModal
+            onAddProduct={onAddProductClick}
+            onRemoveProduct={onRemoveProductClick}
             productSelected={productSelected}
             branchOfficeData={branchOffice}
             show={showProductDetailModal}
@@ -365,6 +396,7 @@ function App() {
       {
         showPaymentInProgressPage &&
           <PaymentInProgressPage
+            currentSecund={currentSecund}
             shoppingCart={shoppingCart}
             branchOfficeData={branchOffice}
             paymentStatus={paymentStatus}

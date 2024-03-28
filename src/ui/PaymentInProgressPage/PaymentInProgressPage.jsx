@@ -1,6 +1,7 @@
-import { useState } from 'react';
 import { LoadingOutlined  } from '@ant-design/icons';
 import { Button, Result, Spin } from 'antd';
+
+import { checkCircleIcon } from '../../assets/icons/icons';
 
 import './PaymentInProgressPage.css';
 
@@ -12,6 +13,7 @@ export const PAYMENT_STATUS = {
 
 export default function PaymentInProgressPage(props) {
   const {
+    currentSecund,
     shoppingCart,
     branchOfficeData,
     paymentStatus,
@@ -33,6 +35,17 @@ export default function PaymentInProgressPage(props) {
       }
       {
         paymentStatus === PAYMENT_STATUS.SUCCESS &&
+          <div className='payment-status__success'>
+            <img src={checkCircleIcon} alt="Success" />
+            <p className='payment-status__title'>¡Venta generada exitosamente!</p>
+            <p className='payment-status__sub-title'>Retire voucher</p>
+            <div className='payment-status__footer'>
+              <button className='payment-status__footer__button' onClick={() => onGoHomeClick()} >Volver al Inicio ({currentSecund})</button>
+            </div>
+          </div>
+      }
+      {/*
+        paymentStatus === PAYMENT_STATUS.SUCCESS &&
           <Result
             status="success"
             title="¡Venta generada exitosamente!"
@@ -43,7 +56,7 @@ export default function PaymentInProgressPage(props) {
               </Button>,
             ]}
           />
-      }
+          */}
       {
         paymentStatus === PAYMENT_STATUS.ERROR &&
           <Result

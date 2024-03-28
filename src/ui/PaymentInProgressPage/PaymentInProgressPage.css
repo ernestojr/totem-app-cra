@@ -18,3 +18,47 @@
   font-style: normal;
   font-weight: 400;
 }
+
+.payment-status__success {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.payment-status__footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.payment-status__footer__button {
+  width: 100%;
+  height: 140px;
+
+  border-radius: 20px;
+  border: none;
+  background: var(--primary);
+
+  color: #FFF;
+  text-align: center;
+  font-size: 37.833px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.payment-status__title {
+  color: #4F4545;
+  text-align: center;
+  font-size: 48px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.payment-status__sub-title {
+  color: #4F4545;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 400;
+}
