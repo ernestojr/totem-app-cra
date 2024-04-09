@@ -388,6 +388,10 @@ export default function ProductDetailModel(props) {
     </>;
   });
 
+  const isDisabled = () => {
+    return !productSelected.is_active || (productSelected.has_stock && productSelected.stock < 1);
+  }
+
   return (
     <>
       <Modal
@@ -429,6 +433,7 @@ export default function ProductDetailModel(props) {
                         type="default"
                         shape="circle"
                         size="large"
+                        disabled={isDisabled()}
                         icon={<MinusOutlined />}
                         onClick={(e) => onRemoveProductClick()} />
                       <p>{productSelected.quantity}</p>
@@ -437,6 +442,7 @@ export default function ProductDetailModel(props) {
                         type="default"
                         shape="circle"
                         size="large"
+                        disabled={isDisabled()}
                         icon={<PlusOutlined />}
                         onClick={(e) => onAddProductClick()} />
                     </div>
@@ -447,7 +453,7 @@ export default function ProductDetailModel(props) {
                 <Button htmlType="button" size='large' onClick={handleCancel}>
                   Cancel
                 </Button>
-                <Button htmlType="submit" size='large' type="primary">
+                <Button htmlType="submit" size='large' type="primary" disabled={isDisabled()}>
                   Agregar ${numeral(productSelected.totalOrder * productSelected.quantity).format('0,0[,]0').replace(/,/g, '.')}
                 </Button>
               </div>

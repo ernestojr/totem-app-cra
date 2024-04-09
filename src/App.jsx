@@ -135,10 +135,10 @@ function App() {
   }
 
   const onAddProductClick = async (product) => {
-    const { id: pid } = product;
+    const { id: pid, fromCart = false } = product;
     const newShoppingCart = [...shoppingCart];
     const index = newShoppingCart.findIndex(p => p.id === pid);
-    if (index >= 0 && newShoppingCart[index] && !hasProductGroup(newShoppingCart[index])) {
+    if (index >= 0 && newShoppingCart[index] && (!hasProductGroup(newShoppingCart[index]) || fromCart)) {
       newShoppingCart[index].quantity += 1;
       newShoppingCart[index].totalOrder = newShoppingCart[index].quantity * newShoppingCart[index].price;
     } else {
@@ -395,7 +395,8 @@ function App() {
         <main className="layout-app">
           <Header
             shoppingCart={shoppingCart}
-            onClickBack={onClickBackAction} />
+            onClickBack={onClickBackAction}
+            onClickPayAction={onClickPayAction} />
           <section className="content-app">
             <div className="title">
               <div className="title_logo">

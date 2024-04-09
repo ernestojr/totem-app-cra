@@ -4,7 +4,7 @@ import { arrowBackIcon, shoppingCartIcon } from '../../assets/icons/icons';
 import './Header.css';
 
 export default function Header(props) {
-  const { shoppingCart = [], onClickBack } = props;
+  const { shoppingCart = [], onClickBack, onClickPayAction } = props;
   const getShoppingCartLength = () => {
     let length = 0;
     shoppingCart.forEach((product) => {
@@ -17,7 +17,7 @@ export default function Header(props) {
       <button onClick={onClickBack}>
         <img src={arrowBackIcon} alt="back" />
       </button>
-      <button>
+      <button onClick={() => onClickPayAction && onClickPayAction()}>
         <Badge count={getShoppingCartLength()}>
           <img src={shoppingCartIcon} alt="shopping_cart" />
         </Badge>

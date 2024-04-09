@@ -64,7 +64,7 @@ export default function Cart(props) {
                 shape="circle"
                 size="large"
                 icon={<PlusOutlined />}
-                onClick={(e) => onAddProductClick(product, e.stopPropagation())} />
+                onClick={(e) => onAddProductClick({ ...product, fromCart: true }, e.stopPropagation())} />
             </div>
           </div>
         ))

@@ -7,7 +7,7 @@ export default function Footer(props) {
   const getTotalAmount = () => {
     let total = 0;
     shoppingCart.forEach((product) => {
-      total += product.quantity * product.price;
+      total += product.quantity * product.totalOrder;
     });
     return total;
   }
