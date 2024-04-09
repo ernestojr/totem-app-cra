@@ -45,7 +45,7 @@ export default function Cart(props) {
                 <p className='cart-page__item__product__price'>${numeral(product.totalOrder).format('0,0[,]0').replace(/,/g, '.')}</p>
                 {
                   product.allOptions.length > 0
-                  && <Collapse ghost items={buildItemsToCollapse(product)} />
+                  && <Collapse className="group-option-collapse" ghost items={buildItemsToCollapse(product)} />
                 }
               </div>
             </div>
@@ -73,14 +73,7 @@ export default function Cart(props) {
         shoppingCart.length === 0
         && <Empty
           image="https://tolivmarket-production.s3.sa-east-1.amazonaws.com/static/images/empty_cart.png"
-          imageStyle={{
-            height: 60,
-          }}
-          description={
-            <h2>
-              Su carro de compra está vacío
-            </h2>
-          }
+          description={<h2>Su carro de compra está vacío</h2>}
         >
           <Button type="primary" size='large' onClick={() => onClickBackAction()}>Agregue Productos</Button>
         </Empty>

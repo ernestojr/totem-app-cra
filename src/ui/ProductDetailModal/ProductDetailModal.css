@@ -20,10 +20,11 @@
 
 .modal-container__detail {
   width: 100%;
+  padding: 10px;
 }
 
 .modal-container__detail .product-name {
-  color: #4F4545;
+  color: var(--dark);
   font-size: 24px;
   font-style: normal;
   font-weight: 700;
@@ -35,17 +36,6 @@
   padding: 5px 0px;
   font-style: normal;
   font-weight: 500;
-}
-.modal-container__detail .product-variant-group {
-  display: flex;
-  padding: 10px;
-}
-
-.modal-container__detail .product-variant-group p {
-  color: #4F4545;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 600;
 }
 
 .modal__button-group {
@@ -64,7 +54,7 @@
 }
 
 .modal-container__detail__cart-actions p {
-  color: #4F4545;
+  color: var(--dark);
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
@@ -90,4 +80,71 @@
 }
 .cart-actions-white button .ant-btn-icon {
   color: var(--primary);
+}
+
+.group-header {
+  padding: 10px 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.group-header .group-name {
+  color: var(--dark);
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.group-header .group-optional {
+  color: var(--dark);
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  padding: 10px;
+}
+
+.group-header .group-required {
+  color: var(--primary);
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  padding: 10px;
+
+  border-radius: 5px;
+  background: linear-gradient(0deg, rgba(245, 116, 35, 0.20) 0%, rgba(245, 116, 35, 0.20) 100%);
+}
+
+.group-criteria {
+  padding: 10px 0px;
+}
+
+.group-criteria .group-criteria__text {
+  color: var(--dark);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.group-criteria .group-criteria__text .group-criteria__text-error {
+  color: red;
+}
+
+.group-criteria .group-criteria__text .group-criteria__text-success {
+  color: green;
+}
+
+.group-criteria .group-criteria__text .group-criteria__text-warning {
+  color: yellow;
+}
+
+.group-options .group-options-checkboxes, .group-options-radios {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-options .group-options-checkboxes .ant-checkbox-group-item, .ant-radio-wrapper {
+  padding: 10px 0px;
 }

@@ -24,14 +24,14 @@
 }
 
 .footer-app_total__key {
-  color: #4F4545;
+  color: var(--dark);
   font-size: 48px;
   font-style: normal;
   font-weight: 700;
 }
 
 .footer-app_total__value {
-  color: #4F4545;
+  color: var(--dark);
   text-align: right;
   font-size: 48px;
   font-style: normal;

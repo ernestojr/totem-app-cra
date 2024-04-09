@@ -18,14 +18,14 @@
 }
 
 .cart-page__title h1 {
-  color: #4F4545;
+  color: var(--dark);
   font-size: 64px;
   font-style: normal;
   font-weight: 600;
 }
 
 .cart-page__sub-title {
-  color: #4F4545;
+  color: var(--dark);
   font-size: 32px;
   font-style: normal;
   font-weight: 700;
@@ -55,7 +55,7 @@
 }
 
 .cart-page__item__product__title {
-  color: var(--dark, var(--dark-text, #4F4545));
+  color: var(--dark);
   font-size: 20px;
   font-style: normal;
   font-weight: 700;
@@ -87,4 +87,15 @@
   font-size: 14px;
   font-weight: 700;
   color: white;
+}
+
+.ant-collapse-header-text, .ant-collapse-content {
+  color: var(--dark);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.ant-collapse-content ul {
+  list-style: none;
 }

@@ -223,7 +223,7 @@ export default function ProductDetailModel(props) {
   };
 
   const showGroups = () => get(productSelected, "branch_offices_products_groups", [])
-  .map((group, groupIndex) => {
+  .map((group) => {
     return <>
       <div className="group-header">
         <p className="group-name">{group.name}</p>
@@ -256,21 +256,21 @@ export default function ProductDetailModel(props) {
             && <p className="group-criteria__text">
               {
                 get(group, 'count') === 0
-                && <span>
+                && <span className={!isOk ? 'group-criteria__text-error' : ''}>
                   {`Elige ${get(group, 'min_value')} ${get(group, 'min_value') === 1? 'opción' : 'opciones'}`}
                 </span>
               }
               {
                 get(group, 'count') > 0
                   && get(group, 'min_value') - get(group, 'count') > 1
-                  && <span>
+                  && <span className={!isOk ? 'group-criteria__text-error' : ''}>
                     {`Faltan ${get(group, 'min_value') - get(group, 'count')} más`}
                   </span>
               }
               {
                 get(group, 'count') > 0
                   && get(group, 'min_value') - get(group, 'count') === 1
-                  && <span>
+                  && <span className={!isOk ? 'group-criteria__text-error' : ''}>
                     {`Falta ${get(group, 'min_value') - get(group, 'count')} más`}
                   </span>
               }
@@ -297,7 +297,7 @@ export default function ProductDetailModel(props) {
               {
                 get(group, 'count') === 0
                 && get(group, 'min_value') > 0
-                && <span>
+                && <span className={!isOk ? 'group-criteria__text-error' : ''}>
                   {`Elige entre ${get(group, 'min_value')} a ${get(group, 'max_value')} opciones`}
                 </span>
               }
@@ -313,7 +313,7 @@ export default function ProductDetailModel(props) {
                  get(group, 'count') > 0
                  && get(group, 'max_value') - get(group, 'count') > 0
                  && get(group, 'min_value') > 0
-                 && <span>
+                 && <span className={!isOk ? 'group-criteria__text-error' : ''}>
                   {`Elige de ${get(group, 'min_value')} a ${get(group, 'max_value')}`}
                 </span>
               }
@@ -333,12 +333,12 @@ export default function ProductDetailModel(props) {
           (get(group, 'type_of_groups_variation.code', '') === 'no_maximum'
           || (get(group, 'type_of_groups_variation.code', '') === 'fixed_quantity'
           && get(group, 'min_value') > 1))
-          && <Checkbox.Group onChange={(event) => onChangeChexBoxOption(event, group)} options={get(group, 'options')}/>
+          && <Checkbox.Group className='group-options-checkboxes' onChange={(event) => onChangeChexBoxOption(event, group)} options={get(group, 'options')}/>
         }
         {
           get(group, 'type_of_groups_variation.code', '') === 'fixed_quantity'
           && get(group, 'min_value') === 1
-          && <Radio.Group onChange={(event) => onChangeRadioOption(event, group)}>
+          && <Radio.Group className='group-options-radios' onChange={(event) => onChangeRadioOption(event, group)}>
             {
               get(group, 'branch_offices_products_groups_options', [])
                 .map((option) => <Radio
@@ -403,7 +403,6 @@ export default function ProductDetailModel(props) {
               layout="vertical"
               onFinish={handleOk}
               onFinishFailed={onFinishFailedForm}
-              autoComplete="off"
               name="formModal">
               <div className='modal-container'>
                 <div className='modal-container__image'>
@@ -414,6 +413,14 @@ export default function ProductDetailModel(props) {
                   <p className='product-price'>${numeral(productSelected.price).format('0,0[,]0').replace(/,/g, '.')}</p>
                   { showCloseCommerceAlert() }
                   { showGroups()}
+                  {
+                    messageStock !== null
+                    && <Alert message={messageStock} type="warning" showIcon/>
+                  }
+                  {
+                    !isOk
+                    && <Alert message="Faltan opciones por completar" type="error" showIcon/>
+                  }
                   <div className='modal-container__detail__cart-actions'>
                     <p>Cantidad deseada</p>
                     <div className='cart-actions-white'>
@@ -444,14 +451,6 @@ export default function ProductDetailModel(props) {
                   Agregar ${numeral(productSelected.totalOrder * productSelected.quantity).format('0,0[,]0').replace(/,/g, '.')}
                 </Button>
               </div>
-              {messageStock !== null && (
-                <Alert
-                  style={{ marginTop: "10px" }}
-                  message={messageStock}
-                  type="warning"
-                  showIcon
-                />
-              )}
             </Form>
           }
       </Modal>
