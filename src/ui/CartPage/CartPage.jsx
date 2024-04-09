@@ -4,7 +4,7 @@ import numeral from 'numeral';
 
 import Header from '../Header/Header';
 import FooterCart from '../FooterCart/FooterCart';
-import { shoppingCartIconBlack } from '../../assets/icons/icons';
+import { shoppingCartIcon } from '../../assets/icons/icons';
 
 import './CartPage.css';
 
@@ -31,7 +31,7 @@ export default function Cart(props) {
       onClickBack={onClickBackAction} />
     <div className="cart-page">
       <div className='cart-page__title'>
-        <img src={shoppingCartIconBlack} alt="cart" />
+        <img src={shoppingCartIcon} alt="cart" />
         <h1>Tu pedido</h1>
       </div>
       <p className='cart-page__sub-title'>Resumen Orden</p>

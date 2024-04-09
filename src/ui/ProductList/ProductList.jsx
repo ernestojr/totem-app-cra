@@ -13,9 +13,6 @@ export default function ProductList(props) {
     onRemoveProductClick,
   } = props;
 
-  const onChange = (key) => {
-  };
-
   const buildTabs = () => {
     return categories.map(category => ({
       key: category.id,
@@ -57,6 +54,5 @@ export default function ProductList(props) {
     <Tabs
       defaultActiveKey="1"
       items={buildTabs()}
-      onChange={onChange}
     />);
 }

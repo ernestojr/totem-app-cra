@@ -3,36 +3,28 @@
   padding: 2rem 10rem 2rem 10rem;
 }
 
-.btn-header {
-  color: var(--primary);
-}
-
 .title {
   display: flex;
   margin-bottom: 2rem;
 }
 
-.title_logo {
-  width: 179px;
-  height: 179px;
-  border-radius: 20px;
-  border: 1;
-  overflow: hidden;
-}
-
-.title_texts {
-  margin-left: 2rem;
+.content-app__title {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0px;
 }
 
-.title_texts h1 {
+
+.content-app__title img {
+  width: 67px;
+  height: 67px;
+}
+
+.content-app__title h1 {
+  color: var(--dark);
   font-size: 64px;
+  font-style: normal;
   font-weight: 700;
-}
-
-.title_texts p {
-  font-size: 24px;
-  font-weight: 400;
 }

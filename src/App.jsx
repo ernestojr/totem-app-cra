@@ -12,7 +12,7 @@ import Footer from "./ui/Footer/Footer";
 import ProductList from "./ui/ProductList/ProductList";
 import ProductDetailModal from "./ui/ProductDetailModal/ProductDetailModal";
 
-import Logo from "./assets/imgs/logo-toliv.png";
+import { storeIcon } from "./assets/icons/icons";
 
 import "./App.css";
 
@@ -408,14 +408,9 @@ function App() {
             onClickBack={onClickBackAction}
             onClickPayAction={onClickPayAction} />
           <section className="content-app">
-            <div className="title">
-              <div className="title_logo">
-                <img src={Logo} alt="Logo" />
-              </div>
-              <div className="title_texts">
-                <h1>Barra Digital TOLIV</h1>
-                <p>Selecciona lo que vas a pedir</p>
-              </div>
+            <div className="content-app__title">
+              <img src={storeIcon} alt="store-icon" />
+              <h1>Ordena Aquí</h1>
             </div>
             {categories && (
               <ProductList
