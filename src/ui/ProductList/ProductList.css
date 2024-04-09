@@ -13,20 +13,4 @@
   font-size: 24px;
   font-style: normal;
   font-weight: 400;
-  transition: color 0.3s ease, font-weight 0.3s ease;
-}
-
-.ant-tabs-tab.ant-tabs-tab-active {
-  border-radius: 8px;
-  background: rgba(245, 116, 35, 0.10);
-  padding: 10px;
-  transition: background 0.3s ease, padding 0.3s ease;
-}
-
-.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: var(--primary);
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 700;
-  transition: color 0.3s ease, font-weight 0.3s ease;
 }
