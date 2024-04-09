@@ -4,11 +4,11 @@ import { arrowBackIcon, shoppingCartIcon } from '../../assets/icons/icons';
 import './Header.css';
 
 export default function Header(props) {
-  const { shoppingCart, onClickBack } = props;
+  const { shoppingCart = [], onClickBack } = props;
   const getShoppingCartLength = () => {
     let length = 0;
-    Object.keys(shoppingCart).forEach((key) => {
-      length += shoppingCart[key].quantity;
+    shoppingCart.forEach((product) => {
+      length += product.quantity;
     });
     return length;
   };

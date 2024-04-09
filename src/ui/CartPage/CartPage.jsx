@@ -1,5 +1,5 @@
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Collapse, Empty } from 'antd';
 import numeral from 'numeral';
 
 import Header from '../Header/Header';
@@ -10,13 +10,21 @@ import './CartPage.css';
 
 export default function Cart(props) {
   const {
-    shoppingCart,
+    shoppingCart = [],
     onClickBackAction,
     onRemoveProductClick,
     onAddProductClick,
     onClickPayAction,
   } = props;
-  const shoppingCartArray = Object.values(shoppingCart);
+  const buildItemsToCollapse = (product) => ([
+    {
+      key: `product-${product.id}-${Date.now()}`,
+      label: `${product.allOptions.length}x ${product.allOptions.length > 1 ? 'Detalles' : 'Detalle'}`,
+      children: <ul>{product.allOptions.map((option, index) => (
+        <li key={`product-${Date.now()}-${index}`}>{option}</li>
+      ))}</ul>,
+    },
+  ]);
   return (<div>
     <Header
       shoppingCart={shoppingCart}
@@ -28,13 +36,17 @@ export default function Cart(props) {
       </div>
       <p className='cart-page__sub-title'>Resumen Orden</p>
       {
-        shoppingCartArray.map((product) => (
+        shoppingCart.map((product) => (
           <div className='cart-page__item'>
             <div className='cart-page__item__product'>
               <img src={product.product.products_images[0].thumbnail} alt={product.product.name} />
               <div className='cart-page__item__product__info'>
                 <p className='cart-page__item__product__title'>{product.product.name}</p>
-                <p className='cart-page__item__product__price'>${numeral(product.price).format('0,0[,]0').replace(/,/g, '.')}</p>
+                <p className='cart-page__item__product__price'>${numeral(product.totalOrder).format('0,0[,]0').replace(/,/g, '.')}</p>
+                {
+                  product.allOptions.length > 0
+                  && <Collapse ghost items={buildItemsToCollapse(product)} />
+                }
               </div>
             </div>
             <div className='cart-page__item__actions'>
@@ -57,10 +69,25 @@ export default function Cart(props) {
           </div>
         ))
       }
+      {
+        shoppingCart.length === 0
+        && <Empty
+          image="https://tolivmarket-production.s3.sa-east-1.amazonaws.com/static/images/empty_cart.png"
+          imageStyle={{
+            height: 60,
+          }}
+          description={
+            <h2>
+              Su carro de compra está vacío
+            </h2>
+          }
+        >
+          <Button type="primary" size='large' onClick={() => onClickBackAction()}>Agregue Productos</Button>
+        </Empty>
+      }
     </div>
     <FooterCart
       shoppingCart={shoppingCart}
-      onClickPayAction={onClickPayAction}
-       />
+      onClickPayAction={onClickPayAction}/>
   </div>);
 }

@@ -3,11 +3,11 @@ import numeral from 'numeral';
 import './Footer.css';
 
 export default function Footer(props) {
-  const { shoppingCart, onClickPayAction } = props;
+  const { shoppingCart = [], onClickPayAction } = props;
   const getTotalAmount = () => {
     let total = 0;
-    Object.keys(shoppingCart).forEach((key) => {
-      total += shoppingCart[key].quantity * shoppingCart[key].price;
+    shoppingCart.forEach((product) => {
+      total += product.quantity * product.price;
     });
     return total;
   }

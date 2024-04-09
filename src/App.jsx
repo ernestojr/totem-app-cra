@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Form, Button, Input } from "antd";
-import { get, has } from 'lodash';
+import { get } from 'lodash';
 import numeral from 'numeral';
 
 import OrangePage from "./ui/OrangePage/OrangePage";
@@ -10,7 +10,7 @@ import PaymentInProgressPage from "./ui/PaymentInProgressPage/PaymentInProgressP
 import Header from "./ui/Header/Header";
 import Footer from "./ui/Footer/Footer";
 import ProductList from "./ui/ProductList/ProductList";
-import ProductDetailModal from "./ui/ProductDetailModal/ProductDetailModalV2";
+import ProductDetailModal from "./ui/ProductDetailModal/ProductDetailModal";
 
 import Logo from "./assets/imgs/logo-toliv.png";
 
@@ -42,7 +42,7 @@ function App() {
   const [branchOffice, setBranchOffice] = useState(null);
   const [categories, setCategories] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [shoppingCart, setShoppingCart] = useState({});
+  const [shoppingCart, setShoppingCart] = useState([]);
   const [productSelected, setProductSelected] = useState(null);
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
   const [showOrangePage, setShowOrangePage] = useState(true);
@@ -71,6 +71,7 @@ function App() {
   };
 
   const updateShoppingCart = (products) => {
+    console.log("updateShoppingCart -> products", products);
     setShoppingCart(products);
     localStorage.setItem(SHOPPING_CART_ITEM, JSON.stringify(products));
   };
@@ -78,8 +79,8 @@ function App() {
   const getShoppingCart = () => {
     const shoppingCart = localStorage.getItem(SHOPPING_CART_ITEM);
     if (!shoppingCart) {
-      updateShoppingCart({});
-      return {};
+      updateShoppingCart([]);
+      return [];
     }
     return JSON.parse(shoppingCart);
   };
@@ -104,10 +105,7 @@ function App() {
     getBranchOfficeData(values.branchOfficeId);
   };
 
-  const hasProductGroup = (product) => {
-    return Array.isArray(product.branch_offices_products_groups)
-      && product.branch_offices_products_groups.length > 0;
-  };
+  const hasProductGroup = (product) => get(product, 'branch_offices_products_groups', []).length > 0;
 
   const addProductFromModal = (product) => {
     addProductToShoppingCart(product);
@@ -115,29 +113,34 @@ function App() {
 
   const addProductToShoppingCart = (product) => {
     const { id: pid, quantity: productQuantity, price: productPrice } = product;
-    const newShoppingCart = { ...shoppingCart };
+    const newShoppingCart = [...shoppingCart];
     if (!hasProductGroup(product)) {
-       if (shoppingCart[pid]) {
-        const newQuantity = newShoppingCart[pid].quantity + productQuantity;
+      const index = newShoppingCart.findIndex(p => p.id === pid);
+      if (index >= 0) {
+        const newQuantity = newShoppingCart[index].quantity + productQuantity;
         const newTotalOrder = productPrice * newQuantity;
-        newShoppingCart[pid].quantity = newQuantity;
-        newShoppingCart[pid].totalOrder = newTotalOrder;
-       } else {
+        newShoppingCart[index].quantity = newQuantity;
+        newShoppingCart[index].totalOrder = newTotalOrder;
+      } else {
         product.totalOrder = product.price * productQuantity;
         product.observations = "";
         product.allOptions = [];
-        newShoppingCart[pid] = { ...product, quantity: productQuantity };
+        newShoppingCart.push({ ...product, quantity: productQuantity });
       }
+    } else {
+      newShoppingCart.push(product);
     }
-    updateShoppingCart(newShoppingCart);  
+    setProductSelected(null);
+    updateShoppingCart(newShoppingCart); 
   }
 
   const onAddProductClick = async (product) => {
     const { id: pid } = product;
-    const newShoppingCart = { ...shoppingCart };
-    if (newShoppingCart[pid] && !hasProductGroup(newShoppingCart[pid])) {
-      newShoppingCart[pid].quantity += 1;
-      newShoppingCart[pid].totalOrder = newShoppingCart[pid].quantity * newShoppingCart[pid].price;
+    const newShoppingCart = [...shoppingCart];
+    const index = newShoppingCart.findIndex(p => p.id === pid);
+    if (index >= 0 && newShoppingCart[index] && !hasProductGroup(newShoppingCart[index])) {
+      newShoppingCart[index].quantity += 1;
+      newShoppingCart[index].totalOrder = newShoppingCart[index].quantity * newShoppingCart[index].price;
     } else {
       const data = await getProductById(pid);
       if (hasProductGroup(data)) {
@@ -148,20 +151,21 @@ function App() {
       }
       // TODO: Solo agregar
       data.totalOrder = data.price * data.quantity;
-      data.observations = "";
+      data.observations = '';
       data.allOptions = [];
-      newShoppingCart[pid] = { ...data, quantity: 1 };
+      newShoppingCart.push({ ...data, quantity: 1 });
     }
     updateShoppingCart(newShoppingCart);
   };
 
   const onRemoveProductClick = (product) => {
     const { id: pid } = product;
-    const newShoppingCart = { ...shoppingCart };
-    if (newShoppingCart[pid]) {
-      newShoppingCart[pid].quantity -= 1;
-      if (newShoppingCart[pid].quantity === 0) {
-        delete newShoppingCart[pid];
+    const newShoppingCart = [...shoppingCart];
+    const index = newShoppingCart.findIndex(p => p.id === pid);
+    if (index >= 0 && newShoppingCart[index]) {
+      newShoppingCart[index].quantity -= 1;
+      if (newShoppingCart[index].quantity === 0) {
+        newShoppingCart.splice(index, 1);
       }
       updateShoppingCart(newShoppingCart);
     }
@@ -198,8 +202,8 @@ function App() {
               } else {
                 maximoFor = group.max_value;
               }
-              for (let l = 0; l < maximoFor; l++) {
-                arraySelect.push(l);
+              for (let num = 0; num < maximoFor; num++) {
+                arraySelect.push(num);
               }
               if (arraySelect.length > 0) {
                 arraySelect.push(arraySelect.length);
@@ -216,6 +220,7 @@ function App() {
         });
       }
       product.quantity = 1;
+      product.totalOrder = product.price;
       product.loading = true;
     }
     return product;
@@ -244,18 +249,47 @@ function App() {
   }
 
   const buildProductsToSale = (productsInCart) => {
-    return productsInCart.map((product) => ({
-      product_id: product.product.id,
-      branch_office_product_id: product.id,
-      quantity: product.quantity,
-      observations: product.observations,
-      products_groups_options: [], // TODO: Pendiente de terminar
-      branch_offices_products_list_id: product.branch_offices_products_list.id,
-    }));
+    return productsInCart.map((product) => {
+      const productsGroupsOptions = [];
+      const productsGroups = get(product, 'branch_offices_products_groups', []);
+      productsGroups.forEach((group) => {
+        const optionsSelected = get(group, 'optionsSelected', []);
+        if (optionsSelected.length > 0) {
+          optionsSelected.forEach((option) => {
+            productsGroupsOptions.push({
+              products_option_id: option,
+              quantity: 1,
+            });
+          });
+        } else if (group.radioSelected){
+          productsGroupsOptions.push({
+            products_option_id: group.radioSelected,
+            quantity: 1,
+          });
+        } else {
+          const options = get(productsGroups, 'branch_offices_products_groups_options', []);
+          options.forEach((option) => {
+            if (option.value > 0) {
+              productsGroupsOptions.push({
+                products_option_id: option.id,
+                quantity: option.value,
+              });
+            }
+          });
+        }
+      });
+      return {
+        product_id: product.product.id,
+        branch_office_product_id: product.id,
+        quantity: product.quantity,
+        observations: product.observations,
+        products_groups_options: productsGroupsOptions, // TODO: Pendiente de terminar
+        branch_offices_products_list_id: product.branch_offices_products_list.id,
+      };
+    });
   }
 
   const onClickPayActionStepTwo = () => {
-    const productsInCart = Object.values(shoppingCart);
     const data = {
       branch_office_id: branchOffice.id,
       users_address_id: null, // TODO: Consultar por este campo
@@ -264,11 +298,12 @@ function App() {
       user_payment_methods_storage_id: null, // TODO: Consultar por este campo
       installments_number: 1,
       observations: "", // TODO: Consultar por este campo
-      products: buildProductsToSale(productsInCart),
+      products: buildProductsToSale(shoppingCart),
       coupon_code: null, // TODO: Consultar por este campo
       delivery_tips: 0, // TODO: Implementar el tip desde backend.
       branch_offices_table_id: undefined, // TODO: Consultar por este campo
     };
+    console.log('onClickPayActionStepTwo -> data', JSON.stringify(data));
     goToSale(data);
   }
 
@@ -345,7 +380,7 @@ function App() {
   };
 
   const onGoHomeClick = () => {
-    updateShoppingCart({});
+    updateShoppingCart([]);
     setShowPaymentInProgressPage(false);
     setShowOrangePage(true);
   }
@@ -380,15 +415,6 @@ function App() {
                 onRemoveProductClick={onRemoveProductClick}
               />
             )}
-          <ProductDetailModal
-            onAddProduct={addProductFromModal}
-            onRemoveProduct={onRemoveProductClick}
-            productSelected={productSelected}
-            setProductSelected={setProductSelected}
-            branchOfficeData={branchOffice}
-            show={showProductDetailModal}
-            setShow={setShowProductDetailModal}
-          />
           </section>
           <Footer
             shoppingCart={shoppingCart}
@@ -415,6 +441,16 @@ function App() {
             onGoHomeClick={onGoHomeClick}
             onGoBackClick={onGoBackClick} />
       }
+      <ProductDetailModal
+        shoppingCart={shoppingCart}
+        onAddProduct={addProductFromModal}
+        onRemoveProduct={onRemoveProductClick}
+        productSelected={productSelected}
+        setProductSelected={setProductSelected}
+        branchOfficeData={branchOffice}
+        show={showProductDetailModal}
+        setShow={setShowProductDetailModal}
+      />
       <Modal
         title="Atención"
         open={isModalOpen}

@@ -7,7 +7,7 @@ import './ProductList.css';
 export default function ProductList(props) {
   const {
     categories,
-    shoppingCart,
+    shoppingCart = [],
     onClickProduct,
     onAddProductClick,
     onRemoveProductClick,
@@ -44,7 +44,13 @@ export default function ProductList(props) {
 
   const getQuantity = (product) => {
     const { id: pid } = product;
-    return shoppingCart[pid] ? shoppingCart[pid].quantity : 0;
+    let quantity = 0;
+    shoppingCart.forEach(p => {
+      if (p.id === pid) {
+        quantity += p.quantity;
+      }
+    });
+    return quantity;
   }
 
   return (

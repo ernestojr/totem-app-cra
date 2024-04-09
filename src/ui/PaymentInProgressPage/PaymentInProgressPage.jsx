@@ -14,7 +14,7 @@ export const PAYMENT_STATUS = {
 export default function PaymentInProgressPage(props) {
   const {
     currentSecund,
-    shoppingCart,
+    shoppingCart = [],
     branchOfficeData,
     paymentStatus,
     onRetryerClick,
