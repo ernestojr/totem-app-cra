@@ -3,7 +3,7 @@ import { Modal, Form, Button, Input } from "antd";
 import { get } from 'lodash';
 import numeral from 'numeral';
 
-import OrangePage from "./ui/OrangePage/OrangePage";
+import Home from "./ui/Home/Home";
 import CartPage from "./ui/CartPage/CartPage";
 import PaymentInProgressPage from "./ui/PaymentInProgressPage/PaymentInProgressPage";
 
@@ -38,6 +38,13 @@ const BRANCH_OFFICE_ID_ITEM = "branch_office_id";
 
 const POS_PAYMENT_METHOD_ID = 11;
 
+const PAGES = {
+  HOME: 'home',
+  PRODUCTS_LIST: 'products_list',
+  CART: 'cart',
+  PAYMENT: 'payment',
+};
+
 function App() {
   const [branchOffice, setBranchOffice] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -45,15 +52,16 @@ function App() {
   const [shoppingCart, setShoppingCart] = useState([]);
   const [productSelected, setProductSelected] = useState(null);
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
-  const [showOrangePage, setShowOrangePage] = useState(true);
-  const [showCartPage, setShowCartPage] = useState(false);
-  const [showPaymentInProgressPage, setShowPaymentInProgressPage] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(PAYMENT_STATUS.PROCESSING);
   const [currentSecund, setCurrentSecund] = useState(0);
+
+  const [currentPage, setCurrentPage] = useState(PAGES.HOME);
+  const [timerIntervalId, setTimerIntervalId] = useState(null);
 
   useEffect(() => {
     initCommerceCode();
     initShoppingCart();
+    // eslint-disable-next-line
   }, []);
 
   const initCommerceCode = () => {
@@ -233,18 +241,18 @@ function App() {
   };
 
   const onClickPayAction = () => {
-    setShowCartPage(true);
+    setCurrentPage(PAGES.CART);
   }
 
   const onClickStart = () => {
-    setShowOrangePage(false);
+    setCurrentPage(PAGES.PRODUCTS_LIST);
   }
 
   const onClickBackAction = () => {
-    if (showCartPage) {
-      setShowCartPage(false);
+    if (currentPage === PAGES.CART) {
+      setCurrentPage(PAGES.PRODUCTS_LIST);
     } else {
-      setShowOrangePage(true);
+      setCurrentPage(PAGES.HOME);
     }
   }
 
@@ -337,12 +345,12 @@ function App() {
       }
       currentSecund--;
     }, 1000);
+    setTimerIntervalId(intervalId);
   }
 
   const goToSale = async (data) => {
     setPaymentStatus(PAYMENT_STATUS.PROCESSING);
-    setShowCartPage(false);
-    setShowPaymentInProgressPage(true);
+    setCurrentPage(PAGES.PAYMENT);
     try {
       let responseOrder = await fetchCreateOrder(data);
       if (!responseOrder || !responseOrder.success) {
@@ -374,24 +382,26 @@ function App() {
   }
 
   const onGoBackClick = () => {
-    setShowCartPage(true);
-    setShowPaymentInProgressPage(false);
+    setCurrentPage(PAGES.CART);
     setPaymentStatus(PAYMENT_STATUS.PROCESSING);
   };
 
   const onGoHomeClick = () => {
     updateShoppingCart([]);
-    setShowPaymentInProgressPage(false);
-    setShowOrangePage(true);
+    setCurrentPage(PAGES.HOME);
+    if (timerIntervalId) {
+      clearInterval(timerIntervalId);
+      setTimerIntervalId(null);
+    }
   }
 
   return (
     <>
       {
-        showOrangePage && <OrangePage onClickStart={onClickStart} />
+        currentPage === PAGES.HOME && <Home onClickStart={onClickStart} />
       }
       {
-        !showOrangePage && !showCartPage && !showPaymentInProgressPage &&
+        currentPage === PAGES.PRODUCTS_LIST &&
         <main className="layout-app">
           <Header
             shoppingCart={shoppingCart}
@@ -423,7 +433,7 @@ function App() {
         </main>
       }
       {
-        showCartPage &&
+        currentPage === PAGES.CART &&
           <CartPage
             shoppingCart={shoppingCart}
             onClickBackAction={onClickBackAction}
@@ -432,7 +442,7 @@ function App() {
             onAddProductClick={onAddProductClick} />
       }
       {
-        showPaymentInProgressPage &&
+        currentPage === PAGES.PAYMENT &&
           <PaymentInProgressPage
             currentSecund={currentSecund}
             shoppingCart={shoppingCart}

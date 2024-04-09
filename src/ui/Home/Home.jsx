@@ -1,8 +1,8 @@
 import { logoTolivBlack } from '../../assets/imgs/images';
 
-import './OrangePage.css';
+import './Home.css';
 
-export default function OrangePage (props) {
+export default function Home (props) {
   const { onClickStart } = props;
   return (
     <div className="orange-page">

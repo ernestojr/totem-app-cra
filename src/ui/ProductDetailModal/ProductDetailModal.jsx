@@ -10,7 +10,6 @@ export default function ProductDetailModel(props) {
   const {
     shoppingCart = [],
     onAddProduct,
-    onRemoveProduct,
     productSelected,
     setProductSelected,
     branchOfficeData,
@@ -109,13 +108,9 @@ export default function ProductDetailModel(props) {
   const image = getProductImage();
 
   const showCloseCommerceAlert = () => {
-    return get(branchOfficeData, 'schedule.from') === '0001-01-01T00:00:00Z' || !get(branchOfficeData, 'schedule.is_online') && (
-      <Alert
-        message="Cerrado temporalmente, no es posible agregar productos."
-        type="error"
-        showIcon
-      />
-    );
+    return ((get(branchOfficeData, 'schedule.from') === '0001-01-01T00:00:00Z')
+      || !get(branchOfficeData, 'schedule.is_online'))
+      && <Alert message="Cerrado temporalmente, no es posible agregar productos." type="error" showIcon/>;
   };
 
   const updateTotal = (newProductSelected) => {
@@ -212,13 +207,13 @@ export default function ProductDetailModel(props) {
     updateCountersAndTotal(newProductSelected);
   };
 
-  const onRemoveProductClick = () => {
+  const onDownQuantityClick = () => {
     if (productSelected.quantity >= 2) {
       setProductSelected({ ...productSelected, quantity: productSelected.quantity - 1 });
     }
   };
 
-  const onAddProductClick = () => {
+  const onUpQuantityClick = () => {
     setProductSelected({ ...productSelected, quantity: productSelected.quantity + 1 });
   };
 
@@ -435,7 +430,7 @@ export default function ProductDetailModel(props) {
                         size="large"
                         disabled={isDisabled()}
                         icon={<MinusOutlined />}
-                        onClick={(e) => onRemoveProductClick()} />
+                        onClick={(e) => onDownQuantityClick()} />
                       <p>{productSelected.quantity}</p>
                       <Button
                         className='card-button'
@@ -444,7 +439,7 @@ export default function ProductDetailModel(props) {
                         size="large"
                         disabled={isDisabled()}
                         icon={<PlusOutlined />}
-                        onClick={(e) => onAddProductClick()} />
+                        onClick={(e) => onUpQuantityClick()} />
                     </div>
                   </div>
                 </div>
