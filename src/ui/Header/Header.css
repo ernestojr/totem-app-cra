@@ -23,3 +23,20 @@
 .header-app button:active img {
   transform: scale(0.9);
 }
+
+.header-app .btn-empty-cart {
+  border-radius: 4px;
+  border: 1px solid #CECECE;
+  background: #FFF;
+  padding: 10px;
+
+  color: var(--dark);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.header-app .btn-empty-cart:active {
+  transform: scale(0.9);
+}

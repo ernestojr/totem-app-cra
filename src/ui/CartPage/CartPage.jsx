@@ -5,17 +5,28 @@ import numeral from 'numeral';
 import Header from '../Header/Header';
 import FooterCart from '../FooterCart/FooterCart';
 import { shoppingCartIcon } from '../../assets/icons/icons';
+import { getTipTotalAmount, getTotalAmount} from '../../lib/utils';
 
 import './CartPage.css';
 
 export default function Cart(props) {
   const {
     shoppingCart = [],
+    branchOfficeData,
+    tipPercentageOption,
     onClickBackAction,
     onRemoveProductClick,
     onAddProductClick,
     onClickPayAction,
+    updateTipPercentageOption,
+    onEmptyCartClick,
   } = props;
+  const { tips_totem: isTipEnable = false } = branchOfficeData;
+
+  const updateTip = (tip) => {
+    updateTipPercentageOption(tip);
+  };
+
   const buildItemsToCollapse = (product) => ([
     {
       key: `product-${product.id}-${Date.now()}`,
@@ -25,10 +36,19 @@ export default function Cart(props) {
       ))}</ul>,
     },
   ]);
+
+  let totalAmount = getTotalAmount(shoppingCart);
+  
+  if (isTipEnable) {
+    totalAmount += getTipTotalAmount(totalAmount, tipPercentageOption);
+  }
+
   return (<div>
     <Header
       shoppingCart={shoppingCart}
-      onClickBack={onClickBackAction} />
+      onClickBack={onClickBackAction}
+      onEmptyCartClick={onEmptyCartClick}
+      isCartPage={true} />
     <div className="cart-page">
       <div className='cart-page__title'>
         <img src={shoppingCartIcon} alt="cart" />
@@ -80,6 +100,9 @@ export default function Cart(props) {
       }
     </div>
     <FooterCart
+      isTipEnable={isTipEnable}
+      updateTip={updateTip}
+      totalAmount={totalAmount}
       shoppingCart={shoppingCart}
       onClickPayAction={onClickPayAction}/>
   </div>);

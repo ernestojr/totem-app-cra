@@ -1,0 +1,54 @@
+.tip__container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+}
+
+.tip__title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.tip__title img {
+  width: 67px;
+  height: 67px;
+}
+
+.tip__title h2 {
+  color: var(--dark);
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.tip__option-container {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+}
+
+.tip__option {
+  background: white;
+  border: 2px solid #A6A6A6;
+  border-radius: 12px;
+  height: 90px;
+
+  color: #A6A6A6;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.tip__option--active {
+  border-radius: 12px;
+  border: 2px solid var(--primary);
+  background: linear-gradient(0deg, rgba(245, 116, 35, 0.10) 0%, rgba(245, 116, 35, 0.10) 100%), #FFF;
+
+  color: var(--primary);
+  font-weight: 700;
+}

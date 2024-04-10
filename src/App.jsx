@@ -13,6 +13,7 @@ import ProductList from "./ui/ProductList/ProductList";
 import ProductDetailModal from "./ui/ProductDetailModal/ProductDetailModal";
 
 import { storeIcon } from "./assets/icons/icons";
+import { getTipTotalAmount, getTotalAmount} from './lib/utils';
 
 import "./App.css";
 
@@ -50,13 +51,15 @@ function App() {
   const [categories, setCategories] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shoppingCart, setShoppingCart] = useState([]);
+  const [tipPercentageOption, setTipPercentageOption] = useState(0);
+
   const [productSelected, setProductSelected] = useState(null);
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(PAYMENT_STATUS.PROCESSING);
   const [currentSecund, setCurrentSecund] = useState(0);
+  const [timerIntervalId, setTimerIntervalId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(PAGES.HOME);
-  const [timerIntervalId, setTimerIntervalId] = useState(null);
 
   useEffect(() => {
     initCommerceCode();
@@ -79,10 +82,15 @@ function App() {
   };
 
   const updateShoppingCart = (products) => {
-    console.log("updateShoppingCart -> products", products);
     setShoppingCart(products);
     localStorage.setItem(SHOPPING_CART_ITEM, JSON.stringify(products));
   };
+
+  const onEmptyCartClick = () => {
+    updateShoppingCart([]);
+  };
+
+  const updateTipPercentageOption = (tip) => setTipPercentageOption(tip);
 
   const getShoppingCart = () => {
     const shoppingCart = localStorage.getItem(SHOPPING_CART_ITEM);
@@ -172,6 +180,7 @@ function App() {
     const index = newShoppingCart.findIndex(p => p.id === pid);
     if (index >= 0 && newShoppingCart[index]) {
       newShoppingCart[index].quantity -= 1;
+      newShoppingCart[index].totalOrder = newShoppingCart[index].price * newShoppingCart[index].quantity;
       if (newShoppingCart[index].quantity === 0) {
         newShoppingCart.splice(index, 1);
       }
@@ -298,20 +307,25 @@ function App() {
   }
 
   const onClickPayActionStepTwo = () => {
+    let tipTotalAmount = 0;
+    const { tips_totem: isTipEnable = false } = branchOffice;
+    const total_amount = getTotalAmount(shoppingCart);
+    if (isTipEnable) {
+      tipTotalAmount += getTipTotalAmount(total_amount, tipPercentageOption);
+    }
     const data = {
       branch_office_id: branchOffice.id,
-      users_address_id: null, // TODO: Consultar por este campo
-      delivery_method_id: 3, // TODO: Consultar por este campo
+      users_address_id: null,
+      delivery_method_id: 3,
       payment_method_id: POS_PAYMENT_METHOD_ID,
-      user_payment_methods_storage_id: null, // TODO: Consultar por este campo
+      user_payment_methods_storage_id: null,
       installments_number: 1,
-      observations: "", // TODO: Consultar por este campo
+      observations: '',
       products: buildProductsToSale(shoppingCart),
-      coupon_code: null, // TODO: Consultar por este campo
-      delivery_tips: 0, // TODO: Implementar el tip desde backend.
-      branch_offices_table_id: undefined, // TODO: Consultar por este campo
+      coupon_code: null,
+      delivery_tips: tipTotalAmount,
+      branch_offices_table_id: undefined,
     };
-    console.log('onClickPayActionStepTwo -> data', JSON.stringify(data));
     goToSale(data);
   }
 
@@ -389,6 +403,7 @@ function App() {
   const onGoHomeClick = () => {
     updateShoppingCart([]);
     setCurrentPage(PAGES.HOME);
+    updateTipPercentageOption(0);
     if (timerIntervalId) {
       clearInterval(timerIntervalId);
       setTimerIntervalId(null);
@@ -431,9 +446,13 @@ function App() {
         currentPage === PAGES.CART &&
           <CartPage
             shoppingCart={shoppingCart}
+            branchOfficeData={branchOffice}
             onClickBackAction={onClickBackAction}
             onClickPayAction={onClickPayActionStepTwo}
             onRemoveProductClick={onRemoveProductClick}
+            onEmptyCartClick={onEmptyCartClick}
+            tipPercentageOption={tipPercentageOption}
+            updateTipPercentageOption={updateTipPercentageOption}
             onAddProductClick={onAddProductClick} />
       }
       {

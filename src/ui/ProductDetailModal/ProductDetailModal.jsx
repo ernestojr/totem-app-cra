@@ -67,7 +67,6 @@ export default function ProductDetailModel(props) {
           acc[option.id] = option;
           return acc;
         }, {});
-        console.log('allOptions', allOptions, index);
         if (group.optionsSelected && group.optionsSelected.length > 0) {
           group.optionsSelected.forEach((optionIdSelected) => {
             allOptions.push(`1x ${optionsMap[optionIdSelected].name}`);
