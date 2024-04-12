@@ -1,4 +1,4 @@
-import { Badge } from "antd";
+import { Badge, Modal } from "antd";
 import { arrowBackIcon, shoppingCartIcon } from '../../assets/icons/icons';
 
 import './Header.css';
@@ -18,6 +18,23 @@ export default function Header(props) {
     });
     return length;
   };
+  const onClick = async () => {
+    if (shoppingCart.length > 0) {
+      Modal.confirm({
+        title: '¡Confirme por favor!',
+        content: '¿Confirmas que deseas vaciar el carrito?',
+        cancelText: 'Cancelar',
+        okText: 'Confirmar',
+        footer: (_, { OkBtn, CancelBtn }) => (
+          <>
+            <CancelBtn/>
+            <OkBtn/>
+          </>
+        ),
+        onOk: () => onEmptyCartClick(),
+      });
+    }
+  }
   return (
     <header className="header-app">
       <button onClick={onClickBack}>
@@ -29,7 +46,7 @@ export default function Header(props) {
             <img src={shoppingCartIcon} alt="shopping_cart" />
           </Badge>
         </button>
-        : <button className="btn-empty-cart" onClick={() => shoppingCart.length > 0 && onEmptyCartClick()}>
+        : <button className="btn-empty-cart" onClick={onClick}>
           Limpiar Selección
         </button>
       }
